@@ -1,0 +1,22 @@
+{
+  "name": "bamazon",
+  "version": "1.0.0",
+  "description": "An Amazon-like app that will take in orders from customers and deplete stock from the company's inventory. The app also tracks product sales across departments and provides a summary of the highest-grossing departments.",
+  "main": "bamazonCustomer.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/makeitsoo/Bamazon.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/makeitsoo/Bamazon/issues"
+  },
+  "homepage": "https://github.com/makeitsoo/Bamazon#readme",
+  "dependencies": {
+    "inquirer": "^5.0.1"
+  }
+}

@@ -15,7 +15,8 @@ connection.connect(function(err) {
 		throw err;
 		console.error(err)
 	}
-	console.log("connected")
+	console.log("CURRENT TEA SELECTION");
+	console.log("---------------------");
 });
 
 // query returns all songs by particular artist
@@ -80,8 +81,9 @@ connection.query("SELECT item_id, product_name, price, stock_quantity FROM produ
 					  			console.log(answer.quantity + " " + answer.choice + " tea SUCCESSFULLY PURCHASED!");
 						}
 					);
-   					// Once the update goes through, show the customer the total cost of their purchase.
-   					console.log("TOTAL AMOUNT CHARGED: $" + answer.quantity + chosenItem.price);
+   					// show the customer the total cost of their purchase.
+   					console.log("TOTAL AMOUNT CHARGED: $" + answer.quantity * chosenItem.price);
+   					terminate();
 	        	}
 	        	// else display message to user and reprompt 
 	        	else {

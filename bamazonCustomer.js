@@ -1,0 +1,87 @@
+var mysql = require("mysql");
+var inquirer = require("inquirer");
+
+// create the connection information for the sql database
+var connection = mysql.createConnection({
+  host: "localhost",
+  port: 3306,
+  user: "root",
+  password: "",
+  database: "BAMAZON"
+});
+
+connection.connect(function(err) {
+	if (err) {
+		throw err;
+		console.error(err)
+	}
+	console.log("connected")
+});
+
+// query returns all songs by particular artist
+connection.query("SELECT item_id, product_name, price, stock_quantity FROM products; ",
+	function(err, res) {
+		if (err) {
+			throw err;
+			console.error(err);
+		}
+		for (var i = 0; i < res.length; i++) {
+			// console.log(results[i]);
+			console.log("Item ID: " + res[i].item_id + " || Tea: " + res[i].product_name + " || Price: " + res[i].price);
+			// console.log(res);
+			// terminate();
+		}
+		promptUser();
+
+	function promptUser(){
+	    inquirer
+	      	.prompt([
+	        	{
+	          		name: "choice",
+	          		type: "rawlist",
+	          		choices: function() {
+	            		var choiceArray = [];
+	            		for (var i = 0; i < res.length; i++) {
+	              			choiceArray.push(res[i].product_name);
+	            		}
+	            		return choiceArray;
+	          		},
+	          		message: "Which item would you like to purchase?"
+	        	},
+	        	{
+	          		name: "quantity",
+	          		type: "input",
+	          		message: "How many would you like to buy?"
+	        	}
+	    	])
+	    	// return answer from inquirer user input
+	    	.then(function(answer) {
+	    		console.log("answer: ", answer);
+	        	// get the information of the chosen item
+	        	var chosenItem;
+	        	for (var i = 0; i < res.length; i++) {
+	        		// updates chosenItem variable with the users selection if there is a match with optional items/products 
+	          		if (res[i].product_name === answer.choice) {
+	            		chosenItem = res[i];
+	          		}
+	        	}
+	        	// checks if sufficient inventory for users purhase
+	        	if (answer.quantity < chosenItem.stock_quantity) {
+	        		console.log("success - item purchased");
+	        		//////////////////////////////////////////////
+	        					// code here for #8
+	        		//////////////////////////////////////////////
+	        	}
+	        	// else display message to user and reprompt 
+	        	else {
+	        		console.log("Sorry but we currently have insufficient inventory to fulfill your request for " + answer.quantity + " " + answer.choice + "packages. Please reduce qantity to " + chosenItem.stock_quantity + " or less. Thank you.");
+	        		promptUser();
+	        	}
+	    	});
+		}
+});
+
+
+function terminate() {
+	connection.end();
+};

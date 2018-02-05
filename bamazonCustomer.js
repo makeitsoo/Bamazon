@@ -27,7 +27,7 @@ connection.query("SELECT item_id, product_name, price, stock_quantity FROM produ
 		}
 		for (var i = 0; i < res.length; i++) {
 			// console.log(results[i]);
-			console.log("Item ID: " + res[i].item_id + " || Tea: " + res[i].product_name + " || Price: " + res[i].price);
+			console.log("Item ID: " + res[i].item_id + " || Tea: " + res[i].product_name + " || Price: $" + res[i].price);
 			// console.log(res);
 			// terminate();
 		}
@@ -56,7 +56,7 @@ connection.query("SELECT item_id, product_name, price, stock_quantity FROM produ
 	    	])
 	    	// return answer from inquirer user input
 	    	.then(function(answer) {
-	    		console.log("answer: ", answer);
+	    		// console.log("answer: ", answer);
 	        	// get the information of the chosen item
 	        	var chosenItem;
 	        	for (var i = 0; i < res.length; i++) {
@@ -67,10 +67,21 @@ connection.query("SELECT item_id, product_name, price, stock_quantity FROM produ
 	        	}
 	        	// checks if sufficient inventory for users purhase
 	        	if (answer.quantity < chosenItem.stock_quantity) {
-	        		console.log("success - item purchased");
-	        		//////////////////////////////////////////////
-	        					// code here for #8
-	        		//////////////////////////////////////////////
+	        		// var to store new updated stock_quantity for item
+	        		updatedQuantity = chosenItem.stock_quantity - answer.quantity;
+	        		console.log("item inventory: ", chosenItem.stock_quantity)
+	        		console.log("quantity purchased: ", answer.quantity)
+	        		console.log("updated quantity: ", updatedQuantity)
+	        		// update stock_quantity for item in MySQL database 
+					connection.query("UPDATE products SET ? WHERE ?",
+						[{stock_quantity: updatedQuantity}, {item_id: chosenItem.item_id}],
+						function(error) {
+					  		if (error) throw err;
+					  			console.log(answer.quantity + " " + answer.choice + " tea SUCCESSFULLY PURCHASED!");
+						}
+					);
+   					// Once the update goes through, show the customer the total cost of their purchase.
+   					console.log("TOTAL AMOUNT CHARGED: $" + answer.quantity + chosenItem.price);
 	        	}
 	        	// else display message to user and reprompt 
 	        	else {

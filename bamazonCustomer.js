@@ -15,6 +15,7 @@ connection.connect(function(err) {
 		throw err;
 		console.error(err)
 	}
+	console.log("---------------------");
 	console.log("CURRENT TEA SELECTION");
 	console.log("---------------------");
 });
@@ -32,6 +33,7 @@ connection.query("SELECT item_id, product_name, price, stock_quantity FROM produ
 			// console.log(res);
 			// terminate();
 		}
+		console.log("---------------------");
 		promptUser();
 
 	function promptUser(){

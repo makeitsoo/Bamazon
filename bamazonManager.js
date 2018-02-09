@@ -30,7 +30,7 @@ function run() {
 			} else if (answer.mainMenu === "Add New Product") {
 				console.log("\n   ADD NEW PRODUCT")
 				console.log("----------------------")
-	    		// queryAddProduct();
+	    		queryAddProduct();
 			} else if (answer.mainMenu === "I'm Done!") {
 				console.log("\n    GOOD BYE!")
 	    		terminate();
@@ -164,6 +164,21 @@ function run() {
 			    	})
 		});
 	};
+
+	// function that allows admin user to add new products to platform
+	function queryAddProduct() {
+
+		
+		connection.query("INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES ('nettles', 'green tea', 10, 9);",
+			function(err, res) {
+				if (err) {
+					throw err;
+					console.error(err);
+				}
+				console.log(res);
+				terminate();
+		})
+	}
 
 	function terminate() {
 		connection.end();

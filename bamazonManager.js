@@ -7,7 +7,7 @@ function run() {
 	    	{
 	      		name: "mainMenu",
 	      		type: "rawlist",
-	      		choices: ["View Items Listed for Sale", "View Low Inventory", "Add to Inventory", "Add New Product"],
+	      		choices: ["View Items Listed for Sale", "View Low Inventory", "Add to Inventory", "Add New Product", "I'm Done!"],
 	      		message: "What would you like to do?"
 	    	}
 		])
@@ -16,23 +16,27 @@ function run() {
 			// console.log("answer: ", answer);
 			if (answer.mainMenu === "View Items Listed for Sale") {
 				// get all items for sale
-				console.log("CURRENT ITEMS FOR SALE")
-				console.log("----------------------")
+				console.log("\n              CURRENT ITEMS FOR SALE")
+				console.log("---------------------------------------------------------")
 	    		queryAllItems();
 			} else if (answer.mainMenu === "View Low Inventory") {
-				console.log("    LOW INVENTORY")
-				console.log("----------------------")
-	    		// queryLowInventory();
+				console.log("\n          LOW INVENTORY")
+				console.log("----------------------------------------")
+				queryLowInventory();
 			} else if (answer.mainMenu === "Add to Inventory") {
-				console.log("   ADD TO INVENTORY")
+				console.log("\n   ADD TO INVENTORY")
 				console.log("----------------------")
 	    		// queryAddInventory();
 			} else if (answer.mainMenu === "Add New Product") {
-				console.log("   ADD NEW PRODUCT")
+				console.log("\n   ADD NEW PRODUCT")
 				console.log("----------------------")
 	    		// queryAddProduct();
+			} else if (answer.mainMenu === "I'm Done!") {
+				console.log("\n    GOOD BYE!")
+	    		terminate();
 			} else {
-				console.log("Invalid selection. Please choose 1-4.")
+				console.log("----------------------")
+				console.log("\nInvalid selection. Please choose 1-4.\n")
 			}
 		});
 	}
@@ -68,14 +72,36 @@ function run() {
 				}
 				for (var i = 0; i < res.length; i++) {
 					// console.log(results[i]);
-					console.log("Item ID: " + res[i].item_id + " || Tea: " + res[i].product_name + " || Price: $" + res[i].price);
+					console.log("Item ID: " + res[i].item_id + " || Tea: " + res[i].product_name + " || Price: $" + res[i].price + " || # In Stock: " + res[i].stock_quantity);
 					// console.log(res);
 				}
-				console.log("---------------------");
+				console.log("---------------------------------------------------------");
 				// promptUser();
-		});
+			});
 		terminate();
 	};
+
+
+	function queryLowInventory() {
+		connection.query("SELECT item_id, product_name, stock_quantity FROM products WHERE stock_quantity < 5;",
+			function(err, res) {
+				if (err) {
+					throw err
+					console.error(err);
+				}
+
+				for (var i = 0; i < res.length; i++) {
+					// console.log("res[i]: ", res[i]);
+					// console.log(res.product_name);			
+					console.log("Tea: " + res[i].product_name + " || # In Stock: " + res[i].stock_quantity);
+				}
+				console.log("----------------------------------------")
+				console.log("\nPlease order and restock items listed above.")
+			});
+		terminate();
+	}
+
+
 
 	function terminate() {
 		connection.end();

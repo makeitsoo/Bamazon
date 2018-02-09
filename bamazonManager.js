@@ -26,7 +26,7 @@ function run() {
 			} else if (answer.mainMenu === "Add to Inventory") {
 				console.log("\n   ADD TO INVENTORY")
 				console.log("----------------------")
-	    		// queryAddInventory();
+	    		queryAddInventory();
 			} else if (answer.mainMenu === "Add New Product") {
 				console.log("\n   ADD NEW PRODUCT")
 				console.log("----------------------")
@@ -50,8 +50,9 @@ function run() {
 	  password: "",
 	  database: "BAMAZON"
 	});
-
+	// connect to MySQL database
 	connection.connect(function(err) {
+		// if issues throw and log an error
 		if (err) {
 			throw err;
 			console.error(err)
@@ -61,8 +62,7 @@ function run() {
 		// console.log("---------------------");
 	});
 
-	// query returns all songs by particular artist
-
+	// function that queries db and returns all items posted for sale
 	function queryAllItems() {
 		connection.query("SELECT item_id, product_name, price, stock_quantity FROM products; ",
 			function(err, res) {
@@ -76,12 +76,11 @@ function run() {
 					// console.log(res);
 				}
 				console.log("---------------------------------------------------------");
-				// promptUser();
 			});
 		terminate();
 	};
 
-
+	// function that queries db and returns all items with less than 5 in inventory
 	function queryLowInventory() {
 		connection.query("SELECT item_id, product_name, stock_quantity FROM products WHERE stock_quantity < 5;",
 			function(err, res) {
@@ -101,7 +100,70 @@ function run() {
 		terminate();
 	}
 
+	// function that Adds inventory to db based on user prompts/input
+	function queryAddInventory() {
+		connection.query("SELECT item_id, product_name, price, stock_quantity FROM products; ",
+			function(err, res) {
+				if (err) {
+					throw err;
+					console.error(err);
+				}
+				for (var i = 0; i < res.length; i++) {
+					// console.log(results[i]);
+					console.log("Item ID: " + res[i].item_id + " || Tea: " + res[i].product_name + " || Price: $" + res[i].price + " || # In Stock: " + res[i].stock_quantity);
+					// console.log(res);
+					// terminate();
+				}
+				console.log("---------------------");
+				// prompt user for input
+				inquirer
+			      	.prompt([
+			        	{
+			          		name: "choice",
+			          		type: "rawlist",
+			          		choices: function() {
+			            		var choiceArray = [];
+			            		for (var i = 0; i < res.length; i++) {
+			              			choiceArray.push(res[i].product_name);
+			            		}
+			            		return choiceArray;
+			          		},
+			          		message: "Which item would you like to Add to?"
+			        	},
+			        	{
+			          		name: "amount",
+			          		type: "input",
+			          		message: "How many would you like to add to your stock?"
+			        	}
+			    	])
+			    	.then(function(answer) {
+			    		// console.log(answer);
+			    		// var sumQuantity = answer.amount + res.stock_quantity;
+						connection.query("UPDATE products SET ? WHERE ? ",
+				            [
+				              {
+				                stock_quantity: answer.amount
+				              },
+				              {
+				                product_name: answer.choice
+				              }
+				            ],
+							function(err, res) {
+								if (err) {
+									throw err;
+									console.error(err);
+								}						
+								// console.log(res);
+								console.log("---------------------------------------------------------");
+								console.log("Success! You're inventory has been updated.")
+								// console.log("Your inventory now has " + res.stock_quantity + " " + res.product_name + ".");
 
+								terminate();
+							}
+						);
+			    	})
+		});
+	};
 
 	function terminate() {
 		connection.end();

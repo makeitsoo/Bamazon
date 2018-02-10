@@ -2,7 +2,28 @@ function run() {
 	var mysql = require("mysql");
 	var inquirer = require("inquirer");
 
+	// create the connection information for the sql database
+	var connection = mysql.createConnection({
+	  host: "localhost",
+	  port: 3306,
+	  user: "root",
+	  password: "",
+	  database: "BAMAZON"
+	});
+	// connect to MySQL database
+	connection.connect(function(err) {
+		// if issues throw and log an error
+		if (err) {
+			throw err;
+			console.error(err)
+		}
+	});
+
+	// function prompts user to select what they would like to do
 	function promptUser(){
+		console.log("-----------------------------------------");
+		console.log("Welcome to the Tea Warehouse Admin Portal");
+		console.log("-----------------------------------------");
 	    inquirer.prompt([
 	    	{
 	      		name: "mainMenu",
@@ -42,26 +63,6 @@ function run() {
 	}
 	promptUser()
 
-	// create the connection information for the sql database
-	var connection = mysql.createConnection({
-	  host: "localhost",
-	  port: 3306,
-	  user: "root",
-	  password: "",
-	  database: "BAMAZON"
-	});
-	// connect to MySQL database
-	connection.connect(function(err) {
-		// if issues throw and log an error
-		if (err) {
-			throw err;
-			console.error(err)
-		}
-		// console.log("---------------------");
-		// console.log("SUCCESSFUL CONNECTION...");
-		// console.log("---------------------");
-	});
-
 	// function that queries db and returns all items posted for sale
 	function queryAllItems() {
 		connection.query("SELECT item_id, product_name, price, stock_quantity FROM products; ",
@@ -94,9 +95,10 @@ function run() {
 					// console.log(res.product_name);			
 					console.log("Tea: " + res[i].product_name + " || # In Stock: " + res[i].stock_quantity);
 				}
-				console.log("----------------------------------------")
-				console.log("\nPlease order and restock items listed above.")
-			});
+				console.log("----------------------------------------");
+				console.log("\nFor each of the items listed above there are less than 5 left in stock. Please order and restock.");
+			}
+		);
 		terminate();
 	}
 
@@ -162,21 +164,49 @@ function run() {
 							}
 						);
 			    	})
-		});
+			}
+		);
 	};
 
 	// function that allows admin user to add new products to platform
 	function queryAddProduct() {
-
-		
-		connection.query("INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES ('nettles', 'green tea', 10, 9);",
-			function(err, res) {
-				if (err) {
-					throw err;
-					console.error(err);
+  		// prompt for info about the item being put up for auction
+	  	inquirer.prompt([
+		    {
+		       	name: "item",
+		        type: "input",
+		        message: "What is the name of the tea you would like to add to your inventory?"
+		    },
+		    {
+				name: "dept",
+	      		type: "rawlist",
+	      		choices: ["green tea", "black tea", "herbal tea", "oolong tea", "matcha"],
+	      		message: "What kind of tea is it?"
+		    },
+		    {
+		        name: "cost",
+		        type: "input",
+		        message: "What sale price would you like to set?"
+		    },
+		    {
+		        name: "quantity",
+		        type: "input",
+		        message: "How many are you adding to your inventory?"
+		    }
+	    ])
+	    .then(function(answer) {
+	    	// query inserts new record in MySQL database using answer cb from user input
+			connection.query("INSERT INTO products (product_name, department_name, price, stock_quantity) VALUES ('" + answer.item + "', '" + answer.dept + "', " + answer.cost + ", " + answer.quantity + ");",
+				function(err, res) {
+					if (err) {
+						throw err;
+						console.error(err);
+					}
+					console.log("---------------------------------------------------------");
+					console.log("Your items have been successfully added to the inventory!");
+					terminate();
 				}
-				console.log(res);
-				terminate();
+			)
 		})
 	}
 
